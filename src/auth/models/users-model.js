@@ -4,29 +4,35 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const users = new mongoose.Schema({
-    username:{ type : String, required: true, unique: true},
-    password: { type : String, required: true},
+    username:{ type : String, unique: true},
+    password: { type : String},
     email: { type: String},
     fullname:{ type : String},
-    role:{ type : String, required: true, default: 'user', enum: ['admin', 'editor','writer','user']}
+    role:{ type : String, default: 'user', enum: ['admin', 'editor','writer','user']}
 })
 // how to modify user instance
 users.pre('save', async function (){
+    console.log('inside of presave asyn function==============')
     // we need to go to a function to hash password before we send it to the database
     if(this.isModified('password')){
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 5);
     }
 })
 
 users.statics.authenticateBasic = function (username, password){
     let query = { username};
     return this.findOne(query)
-        .then(user => user && user.comparePassword(password))
-            .catch(console.error);
+        .then(user => {
+            user && user.comparePassword(password);
+
+        })
+            .catch((error) =>{
+                console.error('8888888something bad8888888888888888')
+            });
 };
 // not statics but methods
 users.methods.generateToken = function (){
-    let token = jwt.sign({username:user.username}, process.env.SECRET)
+    let token = jwt.sign({username:this.username}, process.env.SECRET)
     return token;
 }
 users.methods.comparePassword = function (plainPassword){
