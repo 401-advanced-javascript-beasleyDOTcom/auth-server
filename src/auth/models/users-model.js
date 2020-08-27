@@ -19,26 +19,43 @@ users.pre('save', async function (){
     }
 })
 
-users.statics.authenticateBasic = function (username, password){
-    let query = { username};
-    return this.findOne(query)
-        .then(user => {
-            user && user.comparePassword(password);
+users.statics.authenticateBasic = async function (username, password){
+    const user = await this.findOne({ username});
+    return user && await user.comparePassword(password);
 
-        })
-            .catch((error) =>{
-                console.error('8888888something bad8888888888888888')
-            });
 };
+
+users.methods.comparePassword = async function (plainPassword){
+    const passwordMatch = await bcrypt.compare(plainPassword, this.password);
+    return passwordMatch ? this : null;
+
+};
+
 // not statics but methods
 users.methods.generateToken = function (){
-    let token = jwt.sign({username:this.username}, process.env.SECRET)
+    const payload = {
+        username: this.username,
+        id: this._id,
+        role: this.role,
+      }
+    let token = jwt.sign(payload, 'anInconvenientTruthRythm');
     return token;
 }
-users.methods.comparePassword = function (plainPassword){
-    //methods because it is for this particular user not any user like static would apply to
-    return bcrypt.compare(plainPassword, this.password).then(valid => valid ? this : null)
+
+users.statics.createFromOauth = async function (email){
+    const user = await this.findOne({email});
+    // if email is not valid
+    if(!email){
+        return Promise.reject('Validation Error');
+    }
+    
+    //how to tell that a brand new user is NOT found
+    if(user){
+        return user;
+    }
+    else{      //built in create and save method of mongoose
+        //otherwise return new User({...}).save()
+        return this.create({username: email, password: 'none', email: email})
+    }
 }
-
-
 module.exports = mongoose.model('users', users);

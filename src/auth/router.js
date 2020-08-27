@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('./middleware/basic');
+const OAuthMiddleware = require('./middleware/oauth.js');
 const usersModel = require('./models/users-model');
 
 
@@ -20,19 +21,16 @@ router.post('/signin', auth, (request, response, next) =>{
 // response.send(request.token);
 // next();
 response.status(200).json({token: request.token})
-
-/*
-    response.send({
-        token: request.token,
-    user: request.user,
 })
-*/
-})
-router.get('/users', async (request, response, next) =>{
-    let cait = await usersModel.find({});
-    console.log(cait,'================')
-    response.status(200).json(cait)
+router.get('/users', auth , async (request, response, next) =>{
+    let users = await usersModel.find({});
+    // console.log(cait,'================')
+    response.status(200).json(users)
     next();
+})
+
+router.get('/oauth', OAuthMiddleware, (request, response, next) =>{
+response.status(200).send(request.token);
 })
 
 module.exports = router;

@@ -8,22 +8,37 @@ const Users = require('../models/users-model.js');
 
 module.exports = async (request, response, next) =>{
     console.log(request.headers, '=======================headers')
-if (!request.headers.authorization){ next('error in if because there are no request.headers.authorization'); return;}
+if (!request.headers.authorization){ next({'message': 'Invalid User ID/Password', 'status': 401, 'statusMessage': 'Unauthorized'}); return;}
 
 // basic lskdl:lksdfl
 let basic = request.headers.authorization.split(' ').pop();
 
 let [user, pass] = base64.decode(basic).split(':');
-console.log('========user', user, '================pass', pass)
+try{
 const validUser = await Users.authenticateBasic(user,pass);
-request.token=Users.generateToken(validUser);
+let token = await validUser.generateToken();
+request.token= token;
 request.user=user;
 next();
- 
-    next({'message': 'Invalid User ID/Password', 'status': 401, 'statusMessage': 'Unauthorized'});
+} catch { next({'message': 'Invalid User ID/Password', 'status': 401, 'statusMessage': 'Unauthorized'})}
 
 }
-
+ 
+    // next({'message': 'Invalid User ID/Password', 'status': 401, 'statusMessage': 'Unauthorized'});
+    // return Users.authenticateBasic(user, pass)
+    //     .then( function (){
+    //         user => {
+    //             if(user){
+    //                 request.user = user;
+    //                 request.token = user.generateToken();
+    //                 next();
+    //             }
+    //             else{
+    //                 next(new Error('Invalid'))
+    //             }
+    //         }
+    //     })
+    // }
 // return Users.authenticateBasic(user, pass)
 //     .then(validUser)
 //     function validUser(user){

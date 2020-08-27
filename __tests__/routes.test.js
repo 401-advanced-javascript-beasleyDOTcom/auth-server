@@ -1,6 +1,6 @@
 'use strict';
 
-process.env.SECRET = 'muysecreto';
+let SECRET = 'anInconvenientTruthRythm';
 
 const jwt = require('jsonwebtoken');
 
@@ -21,7 +21,7 @@ describe('Auth Router', () => {
 
       const results = await mockRequest.post('/signup').send(userData);
 
-      const token = jwt.verify(results.text, process.env.SECRET);
+      const token = await jwt.verify(results.text, 'anInconvenientTruthRythm');
 
       expect(token.id).toBeDefined();
 
@@ -34,8 +34,8 @@ describe('Auth Router', () => {
       await mockRequest.post('/signup').send(userData);
 
       const results = await mockRequest.post('/signin').auth('joey', 'password');
-
-      const token = jwt.verify(results.text, process.env.SECRET);
+console.log(results.body,'reslults.test llllllllllllllllllll')
+      const token = jwt.verify(results.body.token, SECRET);
 
       expect(token).toBeDefined();
 
