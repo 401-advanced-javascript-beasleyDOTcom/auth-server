@@ -40,8 +40,12 @@ module.exports = async function authorize(request, response, next){
             redirect_uri: API_SERVER,
             grant_type: 'authorization_code',
         })
+        
         let access_token = tokenResponse.body.access_token;
-        return access_token;} catch(error){console.error(error), 'line 43'}
+        console.log(tokenResponse.body, 'this is the other thing')
+        return access_token; } catch(error){
+            console.error('whats up on this thingy');
+        }
     };
 
     async function getRemoteUserInfo(token){
@@ -54,12 +58,9 @@ module.exports = async function authorize(request, response, next){
     };
 
     async function getUser(remoteUser){
-        let userRecord = {
-            username: remoteUser.login,
-            password: 'oauthpassword', //this is a placeholder for now
-        }
-        let user = await users.save(userRecord);
-        let token = users.generateToken(user);
+
+        let user = await users.createFromOauth(remoteUser.login)
+        let token = user.generateToken();
 
         return [user, token];
     };

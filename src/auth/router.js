@@ -33,4 +33,5 @@ router.get('/oauth', OAuthMiddleware, (request, response, next) =>{
 response.status(200).send(request.token);
 })
 
+
 module.exports = router;

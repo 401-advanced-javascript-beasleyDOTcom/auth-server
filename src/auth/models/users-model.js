@@ -2,17 +2,17 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const SECRET = process.env.JWT_Secret;
 
 const users = new mongoose.Schema({
-    username:{ type : String, unique: true},
-    password: { type : String},
+    username:{ type : String, required: true, unique: true},
+    password: { type : String, required: true},
     email: { type: String},
     fullname:{ type : String},
     role:{ type : String, default: 'user', enum: ['admin', 'editor','writer','user']}
 })
 // how to modify user instance
 users.pre('save', async function (){
-    console.log('inside of presave asyn function==============')
     // we need to go to a function to hash password before we send it to the database
     if(this.isModified('password')){
     this.password = await bcrypt.hash(this.password, 5);
@@ -42,12 +42,28 @@ users.methods.generateToken = function (){
     return token;
 }
 
-users.statics.createFromOauth = async function (email){
-    const user = await this.findOne({email});
-    // if email is not valid
-    if(!email){
+users.statics.authenticateToken = async function (token){
+    let tokenObject = jwt.verify(token, SECRET);
+    const foundUser = await users.findById(tokenObject.id);
+
+    if(foundUser){
+        return foundUser;
+    }
+    else{
+        throw new Error('User not found! sorry...')
+    } 
+}
+
+users.statics.createFromOauth = async function (username){
+     // if email is not valid
+     if(!username){
         return Promise.reject('Validation Error');
     }
+    return await this.findOne({username})
+        .then(user =>{
+
+        })
+
     
     //how to tell that a brand new user is NOT found
     if(user){
