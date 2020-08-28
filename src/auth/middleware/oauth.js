@@ -1,12 +1,12 @@
 'use strict';
 const superagent = require('superagent');
-const users = require('../models/users-model');
+const User = require('../models/users-model');
 
-const tokenServerUrl = 'https://github.com/login/oauth/acces_token';
+const tokenServerUrl = 'https://github.com/login/oauth/access_token';
 const remoteAPI = 'https://api.github.com/user';
-const API_SERVER = 'http://localhost:3003/oauth';
 const CLIENT_ID = 'c08c78457a1e5f418dd8';
 const CLIENT_SECRET = '55474584322507ab26aa07e11000dd96cfa24cf9';
+const API_SERVER = 'http://localhost:3003/oauth';
 
 module.exports = async function authorize(request, response, next){
 
@@ -39,9 +39,13 @@ module.exports = async function authorize(request, response, next){
             client_secret: CLIENT_SECRET,
             redirect_uri: API_SERVER,
             grant_type: 'authorization_code',
-        })
+        });
+        
         let access_token = tokenResponse.body.access_token;
-        return access_token;} catch(error){console.error(error), 'line 43'}
+        console.log(tokenResponse.body, 'this is the other thing')
+        return access_token; } catch(error){
+            console.error('whats up on this thingy');
+        }
     };
 
     async function getRemoteUserInfo(token){
@@ -54,12 +58,9 @@ module.exports = async function authorize(request, response, next){
     };
 
     async function getUser(remoteUser){
-        let userRecord = {
-            username: remoteUser.login,
-            password: 'oauthpassword', //this is a placeholder for now
-        }
-        let user = await users.save(userRecord);
-        let token = users.generateToken(user);
+
+        let user = await User.createFromOauth(remoteUser.login);
+        let token = user.generateToken();
 
         return [user, token];
     };

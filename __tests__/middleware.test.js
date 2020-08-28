@@ -1,9 +1,9 @@
 'use strict';
-
+require('dotenv').config();
 require('@code-fellows/supergoose');
 const auth = require('../src/auth/middleware/basic.js');
 const Users = require('../src/auth//models/users-model.js');
-process.env.SECRET = 'muysecreto';
+const SECRET = process.env.SECRET;
 
 beforeAll(async (done) => {
   await new Users({username: 'admin', password: 'password', role: 'admin', email:'admin@admin.com'}).save();
