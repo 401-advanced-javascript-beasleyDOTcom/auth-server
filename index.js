@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 require('dotenv').config();
 const server = require('./src/server');
 const mongoose = require('mongoose');
@@ -12,6 +12,6 @@ const mongooseOptions = {
 
 mongoose.connect(process.env.MONGODB, mongooseOptions, ()=>{
     server.start();
-}).catch(() => console.log('connect is not working?'));
+})
 
 

@@ -30,7 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.0",
     "morgan": "^1.10.0",
-    "mongodb-memory-server": "^6.6.6",
+    "mongodb-memory-server": "^5.1.5",
     "superagent": "^6.0.0"
   }
 }

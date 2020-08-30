@@ -42,9 +42,8 @@ module.exports = async function authorize(request, response, next){
         });
         
         let access_token = tokenResponse.body.access_token;
-        console.log(tokenResponse.body, 'this is the other thing')
         return access_token; } catch(error){
-            console.error('whats up on this thingy');
+            console.error('UNABLE TO EXCHANGE CODE FOR TOKEN');
         }
     };
 

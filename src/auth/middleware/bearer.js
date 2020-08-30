@@ -11,6 +11,14 @@ module.exports = async function (request, response, next){
         const validUser = await User.authenticateToken(token);
 
         request.user = validUser;
+
+        request.user = {
+            username: validUser.username,
+            fullname: validUser.fullname,
+            email: validUser.email,
+            // capabilities:['REPLACE THIS ARRAY WITH WHAT YOU NEED'],
+            capabilities: validUser.capabilities,
+        };
         next();
     } catch(ERROR){
         next('Invalid Login');

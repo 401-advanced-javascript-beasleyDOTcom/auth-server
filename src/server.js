@@ -1,5 +1,4 @@
 'use strict'
-require('dotenv').config();
 const express = require('express');
 const app = express();
 const routes = require('./auth/router');
@@ -29,4 +28,4 @@ module.exports = {
         const PORT = port || process.env.PORT || 3000;
         app.listen(PORT, ()=> console.log(`listening on ${PORT}`));
     }
-}
+}// this is a little different from lab 14 but should function the same
