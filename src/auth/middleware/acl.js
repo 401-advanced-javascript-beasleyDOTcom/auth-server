@@ -18,8 +18,4 @@ module.exports = (capability) =>{
     };
 
 
-
-
-
-    //end of export
 }
